@@ -1,52 +1,42 @@
 #!/bin/bash
-# Select the Nerd Font from https://www.nerdfonts.com/font-downloads
-# Testing with ShellCheck
 
-echo "[-] Download The Nerd fonts [-]"
+echo "*** Get Termninal Nerd fonts ***"
 echo "#######################"
-echo "Select Nerd Font"
-fons_list=("Agave" "AnonymousPro" "Arimo" "AurulentSansMono" "BigBlueTerminal" "BitstreamVeraSansMono" "CascadiaCode" "CodeNewRoman" "ComicShannsMono" "Cousine" "DaddyTimeMono" "DejaVuSansMono" "FantasqueSansMono" "FiraCode" "FiraMono" "Gohu" "Go-Mono" "Hack" "Hasklig" "HeavyData" "Hermit" "iA-Writer" "IBMPlexMono" "InconsolataGo" "InconsolataLGC" "Inconsolata" "IosevkaTerm" "JetBrainsMono" "Lekton" "LiberationMono" "Lilex" "Meslo" "Monofur" "Monoid" "Mononoki" "MPlus" "NerdFontsSymbolsOnly" "Noto" "OpenDyslexic" "Overpass" "ProFont" "ProggyClean" "RobotoMono" "ShareTechMono" "SourceCodePro" "SpaceMono" "Terminus" "Tinos" "UbuntuMono" "Ubuntu" "VictorMono")
-PS3="Enter a number: "
-select font_name in "${fons_list[@]}" "Quit";
- do
 
-    if [ -n "$font_name" ]; then
-        
-        echo "Starting download $font_name nerd font"
-        
-        if [ "$(command -v curl)" ]; then
-            echo "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/$font_name.zip"
-            curl -OL "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/$font_name.zip"
-            echo "creating fonts folder: ${HOME}/.fonts"
-            mkdir -p  "$HOME/.fonts"
-            echo "unzip the $font_name.zip"
-            unzip "$font_name.zip" -d "$HOME/.fonts/$font_name/"
-            fc-cache -fv
-            echo "done!"     
-            break
+# Only include the fonts that are popular for terminals
+fonts_list=("JetBrainsMono" "FiraCode" "Hack" "SourceCodePro" "UbuntuMono" "DejaVuSansMono" "Meslo" "CascadiaCode")
 
-        elif [ "$(command -v wget)" ]; then
-            echo "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/$font_name.zip"
-            wget "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/$font_name.zip"
-            echo "creating fonts folder: ${HOME}/.fonts"
-            mkdir -p  "$HOME/.fonts"
-            echo "unzip the $font_name.zip"
-            unzip "$font_name.zip" -d "$HOME/.fonts/$font_name/"
-            fc-cache -fv
-            echo "done!"
-            break
+echo "Installing all selected Nerd Fonts..."
 
-        else
-            
-            echo "We cannot find the curl and wget command. First, install the curl and wget command, one of them."
-            break
-        
-        fi
+for font_name in "${fonts_list[@]}"; do
+    echo "Starting download $font_name nerd font"
+
+    if [ "$(command -v curl)" ]; then
+        echo "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/$font_name.zip"
+        curl -OL "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/$font_name.zip"
+        echo "creating fonts folder: ${HOME}/.fonts"
+        mkdir -p  "$HOME/.fonts"
+        echo "unzip the $font_name.zip"
+        unzip "$font_name.zip" -d "$HOME/.fonts/$font_name/"
+        rm "$font_name.zip"  # Clean up zip file after extraction
+        echo "Installed $font_name"
+
+    elif [ "$(command -v wget)" ]; then
+        echo "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/$font_name.zip"
+        wget "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/$font_name.zip"
+        echo "creating fonts folder: ${HOME}/.fonts"
+        mkdir -p  "$HOME/.fonts"
+        echo "unzip the $font_name.zip"
+        unzip "$font_name.zip" -d "$HOME/.fonts/$font_name/"
+        rm "$font_name.zip"  # Clean up zip file after extraction
+        echo "Installed $font_name"
 
     else
-        
-        echo "Select the vaild $font_name nerd Font, just type number"
-        continue;
-
+        echo "We cannot find the curl and wget command. First, install the curl and wget command, one of them."
+        exit 1
     fi
 done
+
+# Update font cache once after all fonts are installed
+fc-cache -fv
+echo "All fonts have been installed!"
